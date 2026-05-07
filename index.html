@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <meta name="theme-color" content="#111110">
+  <meta name="theme-color" content="#f7f4ee">
   <title>做到</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,9 +11,16 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #111110; --surface: #1c1c1a; --surface2: #242422;
-      --text: #e8e6df; --muted: #6b6a65; --border: #2a2a28;
-      --accent: #d4a853; --success: #6eb89a; --danger: #c96b6b;
+      --bg: #f7f4ee;
+      --surface: #ffffff;
+      --surface2: #ede9e1;
+      --text: #1a1816;
+      --muted: #9a9590;
+      --border: #e2dcd4;
+      --accent: #3d2f22;
+      --accent-light: #f0e8dc;
+      --success: #4a7a5a;
+      --danger: #a05050;
       --nav-h: 64px;
     }
     html, body { height: 100%; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; -webkit-font-smoothing: antialiased; overflow: hidden; }
@@ -23,30 +30,41 @@
     .page.active { opacity: 1; pointer-events: all; }
     .overlay { position: fixed; inset: 0; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; padding: 28px 24px 44px; background: var(--bg); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s; overflow-y: auto; }
     .overlay.active { opacity: 1; pointer-events: all; }
+
+    /* BOTTOM NAV */
     #bottom-nav { height: var(--nav-h); display: flex; align-items: stretch; border-top: 1px solid var(--border); background: var(--bg); padding-bottom: env(safe-area-inset-bottom, 0); flex-shrink: 0; }
     .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: none; border: none; color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color 0.15s; font-family: 'DM Mono', monospace; }
     .nav-btn.active { color: var(--accent); }
     .nav-btn svg { width: 20px; height: 20px; }
     .nav-btn span { font-size: 10px; letter-spacing: 0.05em; }
+
+    /* COMMON */
     .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-shrink: 0; }
     .page-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; }
     .icon-btn { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--surface); border-radius: 50%; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
     .icon-btn:active { transform: scale(0.9); background: var(--surface2); }
     .back-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; padding: 0; margin-bottom: 28px; display: flex; align-items: center; gap: 6px; -webkit-tap-highlight-color: transparent; letter-spacing: 0.05em; flex-shrink: 0; }
     .section-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 28px; line-height: 1.25; flex-shrink: 0; }
+
+    /* FORMS */
     .field { margin-bottom: 20px; }
     .field label { display: block; font-size: 10px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
-    .field input, .field textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; outline: none; transition: border-color 0.2s; resize: none; }
-    .field input:focus, .field textarea:focus { border-color: var(--accent); }
-    .field input[type="date"] { color-scheme: dark; }
+    .field input, .field textarea, .field select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; outline: none; transition: border-color 0.2s; resize: none; }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
+    .field input[type="date"] { color-scheme: light; }
     .field input::placeholder, .field textarea::placeholder { color: var(--muted); }
-    .btn-primary { width: 100%; height: 54px; background: var(--accent); border: none; border-radius: 14px; color: #111110; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
-    .btn-primary:active:not(:disabled) { transform: scale(0.97); opacity: 0.88; }
+    .field select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239a9590' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+
+    /* BUTTONS */
+    .btn-primary { width: 100%; height: 54px; background: var(--accent); border: none; border-radius: 14px; color: #f7f4ee; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+    .btn-primary:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
     .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
     .btn-ghost { width: 100%; height: 48px; background: none; border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 13px; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
-    .btn-ghost:active { background: var(--surface); }
+    .btn-ghost:active { background: var(--surface2); }
+
+    /* EMPTY STATE */
     .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
-    .empty-symbol { font-size: 36px; opacity: 0.1; }
+    .empty-symbol { font-size: 36px; opacity: 0.15; }
     .empty-state p { color: var(--muted); font-size: 13px; line-height: 1.7; }
 
     /* MAIN */
@@ -64,7 +82,7 @@
     .step-text.completing::after { content: ''; position: absolute; left: 0; top: 50%; height: 1px; background: var(--success); animation: strike 0.35s ease forwards; }
     @keyframes strike { from { width: 0; } to { width: 100%; } }
     .step-time { font-size: 12px; color: var(--muted); font-style: italic; }
-    .check-btn { width: 100%; height: 58px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.06em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.15s; -webkit-tap-highlight-color: transparent; margin-top: 32px; }
+    .check-btn { width: 100%; height: 58px; background: var(--accent-light); border: 1px solid var(--border); border-radius: 14px; color: var(--accent); font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.06em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.15s; -webkit-tap-highlight-color: transparent; margin-top: 32px; }
     .check-btn:active:not(:disabled) { transform: scale(0.97); background: var(--surface2); }
     .check-btn:disabled { opacity: 0.5; }
     .switch-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; padding: 14px 0 0; width: 100%; text-align: center; letter-spacing: 0.05em; -webkit-tap-highlight-color: transparent; }
@@ -101,7 +119,7 @@
     /* ALL TASKS */
     .task-list-item { padding: 16px 0; border-bottom: 1px solid var(--border); cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .task-list-item:last-child { border-bottom: none; }
-    .task-list-item:active { opacity: 0.7; }
+    .task-list-item:active { opacity: 0.6; }
     .task-list-title { font-size: 14px; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
     .task-list-meta { font-size: 11px; color: var(--muted); }
 
@@ -109,11 +127,11 @@
     .routine-item { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--border); }
     .routine-item:last-child { border-bottom: none; }
     .routine-check { width: 22px; height: 22px; border: 1.5px solid var(--border); border-radius: 50%; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
-    .routine-check.done { background: var(--success); border-color: var(--success); color: #111110; }
+    .routine-check.done { background: var(--success); border-color: var(--success); color: white; }
     .routine-check.done::after { content: '✓'; font-size: 12px; }
     .routine-name { flex: 1; font-size: 14px; color: var(--text); transition: color 0.2s; }
     .routine-name.done { color: var(--muted); text-decoration: line-through; }
-    .routine-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px; -webkit-tap-highlight-color: transparent; opacity: 0.5; }
+    .routine-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px; -webkit-tap-highlight-color: transparent; opacity: 0.4; }
     .routine-delete:active { opacity: 1; color: var(--danger); }
     .add-routine-row { display: flex; gap: 10px; margin-top: 20px; }
     .add-routine-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; outline: none; }
@@ -129,8 +147,8 @@
     .record-date { font-size: 11px; color: var(--muted); }
 
     /* SETTINGS */
-    .settings-note { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
-    .settings-note a { color: var(--accent); text-decoration: none; }
+    .settings-hint { font-size: 11px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .settings-hint a { color: var(--accent); text-decoration: none; }
     .save-indicator { font-size: 11px; color: var(--success); text-align: center; margin-top: 8px; height: 16px; opacity: 0; transition: opacity 0.3s; }
   </style>
 </head>
@@ -206,18 +224,25 @@
 
     <div class="page" id="page-settings">
       <div class="page-header"><span class="page-title">設定</span></div>
-      <p class="settings-note">需要 Anthropic API Key。<br>申請：<a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+      <div class="settings-hint" id="settings-hint"></div>
       <div class="field">
-        <label>API Key</label>
-        <input type="password" id="s-apikey" placeholder="sk-ant-..." oninput="saveSettings()">
+        <label>AI 類型</label>
+        <select id="s-type" onchange="onTypeChange(); saveSettings()">
+          <option value="anthropic">Anthropic</option>
+          <option value="openai">OpenAI 相容（Gemini、Groq 等）</option>
+        </select>
       </div>
       <div class="field">
         <label>Base URL</label>
-        <input type="text" id="s-baseurl" placeholder="https://api.anthropic.com" oninput="saveSettings()">
+        <input type="text" id="s-baseurl" placeholder="" oninput="saveSettings()">
+      </div>
+      <div class="field">
+        <label>API Key</label>
+        <input type="password" id="s-apikey" placeholder="" oninput="saveSettings()">
       </div>
       <div class="field">
         <label>Model</label>
-        <input type="text" id="s-model" placeholder="claude-sonnet-4-20250514" oninput="saveSettings()">
+        <input type="text" id="s-model" placeholder="" oninput="saveSettings()">
       </div>
       <div class="save-indicator" id="save-indicator">已儲存</div>
     </div>
@@ -251,7 +276,7 @@ function getTasks()    { return JSON.parse(localStorage.getItem('tasks') || '[]'
 function setTasks(v)   { localStorage.setItem('tasks', JSON.stringify(v)); }
 function getRoutines() { return JSON.parse(localStorage.getItem('routines') || '[]'); }
 function setRoutines(v){ localStorage.setItem('routines', JSON.stringify(v)); }
-function getSettings() { return JSON.parse(localStorage.getItem('settings') || '{}'); }
+function getSettings() { return JSON.parse(localStorage.getItem('settings') || '{"type":"anthropic"}'); }
 function setSettings(v){ localStorage.setItem('settings', JSON.stringify(v)); }
 function getCount()    { return parseInt(localStorage.getItem('completedCount') || '0'); }
 function setCount(v)   { localStorage.setItem('completedCount', String(v)); }
@@ -361,7 +386,6 @@ function renderSwitch() {
   }).join('');
   if (getPending().length > 4) el.innerHTML += `<button class="btn-ghost" onclick="closeOverlay();showOverlay('all-tasks')" style="margin-top:4px">看全部任務</button>`;
 }
-
 function switchTo(id) { setCurId(id); closeOverlay(); }
 function snoozeCurrentTask() { setCurId(null); closeOverlay(); }
 
@@ -407,46 +431,119 @@ function renderRecords() {
 }
 
 // SETTINGS
+const TYPE_INFO = {
+  anthropic: {
+    hint: '申請 API Key：<a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>',
+    baseUrl: 'https://api.anthropic.com',
+    model: 'claude-sonnet-4-20250514',
+    keyPlaceholder: 'sk-ant-...'
+  },
+  openai: {
+    hint: 'Gemini：<a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>　Groq：<a href="https://console.groq.com" target="_blank">console.groq.com</a><br>OpenRouter：<a href="https://openrouter.ai" target="_blank">openrouter.ai</a>',
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    model: 'gemini-2.5-flash',
+    keyPlaceholder: 'API Key...'
+  }
+};
+
+function onTypeChange() {
+  const type = document.getElementById('s-type').value;
+  const info = TYPE_INFO[type];
+  const s = getSettings();
+  document.getElementById('settings-hint').innerHTML = info.hint;
+  if (!s.baseUrl || s.baseUrl === TYPE_INFO[s.type || 'anthropic'].baseUrl) {
+    document.getElementById('s-baseurl').value = info.baseUrl;
+  }
+  if (!s.model || s.model === TYPE_INFO[s.type || 'anthropic'].model) {
+    document.getElementById('s-model').value = info.model;
+  }
+  document.getElementById('s-apikey').placeholder = info.keyPlaceholder;
+}
+
 function renderSettings() {
   const s = getSettings();
+  const type = s.type || 'anthropic';
+  const info = TYPE_INFO[type];
+  document.getElementById('s-type').value = type;
+  document.getElementById('s-baseurl').value = s.baseUrl || info.baseUrl;
   document.getElementById('s-apikey').value = s.apiKey || '';
-  document.getElementById('s-baseurl').value = s.baseUrl || '';
-  document.getElementById('s-model').value = s.model || '';
+  document.getElementById('s-model').value = s.model || info.model;
+  document.getElementById('s-apikey').placeholder = info.keyPlaceholder;
+  document.getElementById('settings-hint').innerHTML = info.hint;
 }
+
 let saveTimer;
 function saveSettings() {
-  setSettings({ apiKey: document.getElementById('s-apikey').value.trim(), baseUrl: document.getElementById('s-baseurl').value.trim() || 'https://api.anthropic.com', model: document.getElementById('s-model').value.trim() || 'claude-sonnet-4-20250514' });
+  setSettings({
+    type: document.getElementById('s-type').value,
+    baseUrl: document.getElementById('s-baseurl').value.trim(),
+    apiKey: document.getElementById('s-apikey').value.trim(),
+    model: document.getElementById('s-model').value.trim()
+  });
   const ind = document.getElementById('save-indicator'); ind.style.opacity = '1';
   clearTimeout(saveTimer); saveTimer = setTimeout(() => { ind.style.opacity = '0'; }, 2000);
 }
 
-// SUBMIT TASK
-async function submitTask() {
-  const title = document.getElementById('task-input').value.trim(); const ddl = document.getElementById('ddl-input').value;
-  if (!title) return;
+// API CALL
+async function callAI(systemPrompt, userMessage) {
   const s = getSettings();
-  if (!s.apiKey) { alert('請先在設定頁面填入 API Key'); closeOverlay(); showPage('settings'); return; }
-  document.getElementById('submit-btn').disabled = true; showOverlay('loading');
-  try {
-    const baseUrl = s.baseUrl || 'https://api.anthropic.com'; const model = s.model || 'claude-sonnet-4-20250514';
+  if (!s.apiKey) throw new Error('no_key');
+  const type = s.type || 'anthropic';
+  const baseUrl = s.baseUrl || TYPE_INFO[type].baseUrl;
+  const model = s.model || TYPE_INFO[type].model;
+
+  if (type === 'anthropic') {
     const res = await fetch(`${baseUrl}/v1/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': s.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model, max_tokens: 1000,
-        system: '你是一個任務拆解助手，幫助有ADHD的人把任務拆成可執行的小步驟。每個步驟必須具體、可操作、5到15分鐘內可完成。第一步要特別簡單，降低啟動門檻。只回傳JSON陣列，不要其他文字。格式：[{"text":"步驟內容","minutes":數字}]',
-        messages: [{ role: 'user', content: `任務：${title}\n${ddl ? '截止日期：'+ddl : '沒有截止日期'}\n請拆解成最多12個步驟，用繁體中文。` }] })
+      body: JSON.stringify({ model, max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: userMessage }] })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'Anthropic API error');
+    return data.content[0].text;
+  } else {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${s.apiKey}` },
+      body: JSON.stringify({ model, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }] })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error?.message || 'API error');
-    const steps = JSON.parse(data.content[0].text.replace(/```json|```/g, '').trim());
+    return data.choices[0].message.content;
+  }
+}
+
+// SUBMIT TASK
+async function submitTask() {
+  const title = document.getElementById('task-input').value.trim();
+  const ddl = document.getElementById('ddl-input').value;
+  if (!title) return;
+
+  const s = getSettings();
+  if (!s.apiKey) { alert('請先在設定頁面填入 API Key'); closeOverlay(); showPage('settings'); return; }
+
+  document.getElementById('submit-btn').disabled = true;
+  showOverlay('loading');
+
+  try {
+    const system = '你是一個任務拆解助手，幫助有ADHD的人把任務拆成可執行的小步驟。每個步驟必須具體、可操作、5到15分鐘內可完成。第一步要特別簡單，降低啟動門檻。只回傳JSON陣列，不要其他文字。格式：[{"text":"步驟內容","minutes":數字}]';
+    const user = `任務：${title}\n${ddl ? '截止日期：'+ddl : '沒有截止日期'}\n請拆解成最多12個步驟，用繁體中文。`;
+    const raw = await callAI(system, user);
+    const steps = JSON.parse(raw.replace(/```json|```/g, '').trim());
+
     const tasks = getTasks();
     const task = { id: Date.now().toString(), title, ddl: ddl || null, steps: steps.map((s,i) => ({ id: i, text: s.text, minutes: s.minutes, done: false })), completed: false, createdAt: new Date().toISOString() };
     tasks.push(task); setTasks(tasks); setCurId(task.id);
-    document.getElementById('task-input').value = ''; document.getElementById('ddl-input').value = '';
-    document.getElementById('submit-btn').disabled = false; closeOverlay();
+
+    document.getElementById('task-input').value = '';
+    document.getElementById('ddl-input').value = '';
+    document.getElementById('submit-btn').disabled = false;
+    closeOverlay();
   } catch (err) {
-    console.error(err); document.getElementById('submit-btn').disabled = false;
-    alert('發生錯誤：' + err.message); showOverlay('add');
+    console.error(err);
+    document.getElementById('submit-btn').disabled = false;
+    if (err.message === 'no_key') { alert('請先在設定頁面填入 API Key'); closeOverlay(); showPage('settings'); }
+    else { alert('發生錯誤：' + err.message); showOverlay('add'); }
   }
 }
 
