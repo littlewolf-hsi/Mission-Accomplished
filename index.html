@@ -7,7 +7,8 @@
   <title>🐺Tasks🐾</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/umd/lucide.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -19,6 +20,7 @@
     html, body { height: 100%; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; -webkit-font-smoothing: antialiased; overflow: hidden; }
     #app { height: 100%; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; position: relative; }
     #content { flex: 1; overflow: hidden; position: relative; }
+
     .page { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 28px 24px 16px; opacity: 0; pointer-events: none; overflow-y: auto; transition: opacity 0.2s; }
     .page.active { opacity: 1; pointer-events: all; }
     .overlay { position: fixed; inset: 0; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; padding: 28px 24px 44px; background: var(--bg); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s; overflow-y: auto; }
@@ -28,89 +30,103 @@
     #bottom-nav { height: var(--nav-h); display: flex; align-items: stretch; border-top: 1px solid var(--border); background: var(--bg); padding-bottom: env(safe-area-inset-bottom,0); flex-shrink: 0; }
     .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: none; border: none; color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color 0.15s; font-family: 'DM Mono', monospace; }
     .nav-btn.active { color: var(--accent); }
-    .nav-btn svg { width: 20px; height: 20px; }
+    .nav-btn svg { width: 20px; height: 20px; stroke-width: 1.5; }
     .nav-btn span { font-size: 10px; letter-spacing: 0.05em; }
 
     /* COMMON */
-    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-shrink: 0; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-shrink: 0; }
     .page-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; }
-    .icon-btn { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--surface); border-radius: 50%; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+    .icon-btn { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--surface); border-radius: 50%; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
     .icon-btn:active { transform: scale(0.9); background: var(--surface2); }
-    .back-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; padding: 0; margin-bottom: 28px; display: flex; align-items: center; gap: 6px; -webkit-tap-highlight-color: transparent; letter-spacing: 0.05em; flex-shrink: 0; }
+    .icon-btn svg { width: 18px; height: 18px; stroke-width: 1.5; }
+    .back-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; padding: 0; margin-bottom: 24px; display: flex; align-items: center; gap: 6px; -webkit-tap-highlight-color: transparent; letter-spacing: 0.05em; flex-shrink: 0; }
+    .back-btn svg { width: 14px; height: 14px; stroke-width: 1.5; }
     .section-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 24px; line-height: 1.25; flex-shrink: 0; }
     .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
     .empty-symbol { font-size: 36px; opacity: 0.15; }
     .empty-state p { color: var(--muted); font-size: 13px; line-height: 1.7; }
 
-    /* FORMS */
-    .field { margin-bottom: 18px; }
-    .field label { display: block; font-size: 10px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
-    .field input, .field textarea, .field select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; outline: none; transition: border-color 0.2s; resize: none; }
+    /* FORMS - aligned */
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 10px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 7px; }
+    .field input, .field textarea, .field select {
+      display: block; width: 100%;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 13px 14px; color: var(--text);
+      font-family: 'DM Mono', monospace; font-size: 14px;
+      outline: none; transition: border-color 0.2s; resize: none;
+    }
     .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
-    .field input[type="date"] { color-scheme: light; }
+    .field input[type="date"], .field input[type="time"] { color-scheme: light; }
     .field input::placeholder, .field textarea::placeholder { color: var(--muted); }
     .field select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239a9590' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
     .field-hint { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
     /* BUTTONS */
-    .btn-primary { width: 100%; height: 52px; background: var(--accent); border: none; border-radius: 14px; color: #f7f4ee; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+    .btn-primary { display: block; width: 100%; height: 52px; background: var(--accent); border: none; border-radius: 14px; color: #f7f4ee; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
     .btn-primary:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
     .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-    .btn-ghost { width: 100%; height: 48px; background: none; border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 13px; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+    .btn-ghost { display: block; width: 100%; height: 48px; background: none; border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 13px; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
     .btn-ghost:active { background: var(--surface2); }
     .btn-row { display: flex; gap: 10px; }
     .btn-row .btn-primary, .btn-row .btn-ghost { flex: 1; }
+    .method-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.04em; }
 
-    /* MAIN */
+    /* MAIN PAGE */
     #main-content { flex: 1; display: flex; flex-direction: column; }
-    .all-tasks-bar { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background 0.15s; flex-shrink: 0; }
+    .all-tasks-bar { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 11px 14px; margin-bottom: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background 0.15s; flex-shrink: 0; }
     .all-tasks-bar:active { background: var(--surface2); }
-    .all-tasks-bar-left { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+    .all-tasks-bar-left { font-size: 12px; color: var(--muted); }
+    .all-tasks-bar-right { display: flex; align-items: center; gap: 6px; }
     .all-tasks-bar-count { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--accent); }
-    .all-tasks-bar-arrow { font-size: 12px; color: var(--muted); }
-    .task-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-    .task-title-small { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .edit-steps-btn { font-size: 11px; color: var(--muted); background: none; border: none; cursor: pointer; font-family: 'DM Mono', monospace; -webkit-tap-highlight-color: transparent; letter-spacing: 0.04em; flex-shrink: 0; margin-left: 8px; }
+    .all-tasks-bar-right svg { width: 14px; height: 14px; color: var(--muted); stroke-width: 1.5; }
+    .task-header-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+    .task-title-small { font-size: 12px; color: var(--muted); letter-spacing: 0.05em; flex: 1; line-height: 1.4; }
+    .task-ddl-badge { font-size: 10px; color: var(--accent); background: var(--accent-light); border-radius: 6px; padding: 2px 7px; letter-spacing: 0.04em; flex-shrink: 0; margin-left: 8px; margin-top: 1px; }
+    .task-ddl-badge.overdue { color: var(--danger); background: #fae8e8; }
+    .edit-steps-btn { background: none; border: none; color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; padding: 2px; margin-left: 6px; flex-shrink: 0; }
     .edit-steps-btn:active { color: var(--accent); }
-    .progress-dots { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
+    .edit-steps-btn svg { width: 14px; height: 14px; stroke-width: 1.5; }
+    .progress-dots { display: flex; gap: 5px; margin: 20px 0 16px; flex-wrap: wrap; }
     .progress-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
     .progress-dot.done { background: var(--success); }
     .progress-dot.current { background: var(--accent); }
-    .step-counter { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 14px; }
-    .step-text { font-size: clamp(17px, 4.5vw, 22px); font-weight: 300; line-height: 1.6; color: var(--text); margin-bottom: 12px; position: relative; transition: color 0.3s; }
+    .step-counter { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 12px; }
+    .step-text { font-size: clamp(17px,4.5vw,22px); font-weight: 300; line-height: 1.6; color: var(--text); margin-bottom: 10px; position: relative; transition: color 0.3s; }
     .step-text.completing { color: var(--muted); }
     .step-text.completing::after { content: ''; position: absolute; left: 0; top: 50%; height: 1px; background: var(--success); animation: strike 0.35s ease forwards; }
     @keyframes strike { from { width: 0; } to { width: 100%; } }
-    .step-time { font-size: 12px; color: var(--muted); font-style: italic; margin-bottom: 0; }
-    .main-actions { margin-top: 32px; }
-    .check-btn { width: 100%; height: 56px; background: var(--accent-light); border: 1px solid var(--border); border-radius: 14px; color: var(--accent); font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.06em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+    .step-time { font-size: 12px; color: var(--muted); font-style: italic; }
+    .check-btn { width: 100%; height: 56px; background: var(--accent-light); border: 1px solid var(--border); border-radius: 14px; color: var(--accent); font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.06em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.15s; -webkit-tap-highlight-color: transparent; margin-top: 28px; }
+    .check-btn svg { width: 16px; height: 16px; stroke-width: 2; }
     .check-btn:active:not(:disabled) { transform: scale(0.97); }
     .check-btn:disabled { opacity: 0.5; }
     .switch-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; padding: 13px 0 0; width: 100%; text-align: center; letter-spacing: 0.05em; -webkit-tap-highlight-color: transparent; }
     .switch-btn:active { color: var(--text); }
 
-    /* ADD TASK */
-    .method-hint { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
-
     /* STEP EDITOR */
-    #ov-steps .steps-scroll { flex: 1; overflow-y: auto; margin-bottom: 16px; }
-    .step-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .steps-scroll { flex: 1; overflow-y: auto; margin-bottom: 12px; }
+    .step-row { display: flex; align-items: flex-start; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); }
     .step-row:last-child { border-bottom: none; }
-    .step-row-num { font-size: 11px; color: var(--muted); padding-top: 14px; width: 20px; flex-shrink: 0; text-align: right; }
-    .step-row-done { width: 20px; height: 20px; border: 1.5px solid var(--border); border-radius: 50%; flex-shrink: 0; margin-top: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
-    .step-row-done.is-done { background: var(--success); border-color: var(--success); color: white; }
-    .step-row-done.is-done::after { content: '✓'; font-size: 11px; }
+    .step-row-num { font-size: 11px; color: var(--muted); padding-top: 13px; width: 18px; flex-shrink: 0; text-align: right; }
+    .step-row-done { width: 20px; height: 20px; border: 1.5px solid var(--border); border-radius: 50%; flex-shrink: 0; margin-top: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+    .step-row-done.is-done { background: var(--success); border-color: var(--success); }
+    .step-row-done.is-done svg { color: white; }
+    .step-row-done svg { width: 11px; height: 11px; stroke-width: 2.5; opacity: 0; }
+    .step-row-done.is-done svg { opacity: 1; }
     .step-row-inputs { flex: 1; display: flex; flex-direction: column; gap: 6px; }
     .step-input-text { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; outline: none; }
     .step-input-text:focus { border-color: var(--accent); }
     .step-input-text::placeholder { color: var(--muted); }
-    .step-input-min { width: 80px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; outline: none; }
+    .step-input-min { width: 90px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; outline: none; }
     .step-input-min:focus { border-color: var(--accent); }
     .step-input-min::placeholder { color: var(--muted); }
-    .step-row-del { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 8px 4px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; opacity: 0.5; }
+    .step-row-del { background: none; border: none; color: var(--muted); cursor: pointer; padding: 8px 2px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; opacity: 0.4; }
     .step-row-del:active { color: var(--danger); opacity: 1; }
-    .add-step-btn { display: flex; align-items: center; gap: 8px; background: none; border: 1px dashed var(--border); border-radius: 10px; padding: 12px 16px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 16px; -webkit-tap-highlight-color: transparent; }
+    .step-row-del svg { width: 16px; height: 16px; stroke-width: 1.5; }
+    .add-step-btn { display: flex; align-items: center; gap: 8px; background: none; border: 1px dashed var(--border); border-radius: 10px; padding: 12px 14px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 16px; -webkit-tap-highlight-color: transparent; }
     .add-step-btn:active { background: var(--surface2); }
+    .add-step-btn svg { width: 14px; height: 14px; stroke-width: 2; }
 
     /* LOADING */
     #ov-loading { align-items: center; justify-content: center; gap: 24px; }
@@ -132,8 +148,8 @@
     @keyframes fadeup { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
     /* SWITCH */
-    .switch-options { display: flex; flex-direction: column; gap: 12px; flex: 1; }
-    .task-option { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; text-align: left; }
+    .switch-options { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .task-option { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 15px 18px; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; text-align: left; }
     .task-option:active { background: var(--surface2); transform: scale(0.98); }
     .task-option-title { font-size: 14px; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
     .task-option-meta { font-size: 11px; color: var(--muted); }
@@ -141,54 +157,77 @@
     .snooze-btn:active { color: var(--danger); }
 
     /* ALL TASKS */
-    .task-list-item { padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .task-list-item { border-bottom: 1px solid var(--border); }
     .task-list-item:last-child { border-bottom: none; }
-    .task-list-row { display: flex; align-items: center; gap: 10px; }
-    .task-list-info { flex: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .task-list-main { display: flex; align-items: center; gap: 8px; padding: 14px 0; }
+    .task-list-info { flex: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; min-width: 0; }
     .task-list-info:active { opacity: 0.6; }
-    .task-list-title { font-size: 14px; color: var(--text); margin-bottom: 3px; line-height: 1.4; }
+    .task-list-title { font-size: 14px; color: var(--text); margin-bottom: 3px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .task-list-meta { font-size: 11px; color: var(--muted); }
-    .task-list-actions { display: flex; gap: 6px; flex-shrink: 0; }
-    .task-action-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; white-space: nowrap; }
-    .task-action-btn:active { background: var(--surface2); }
-    .task-action-btn.del { border-color: transparent; }
-    .task-action-btn.del:active { color: var(--danger); }
+    .task-icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 6px; -webkit-tap-highlight-color: transparent; flex-shrink: 0; display: flex; align-items: center; }
+    .task-icon-btn:active { color: var(--accent); }
+    .task-icon-btn.del:active { color: var(--danger); }
+    .task-icon-btn svg { width: 16px; height: 16px; stroke-width: 1.5; }
+    .reminder-row { padding: 0 0 12px; display: none; }
+    .reminder-row.open { display: flex; align-items: center; gap: 10px; }
+    .reminder-time-input { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; outline: none; color-scheme: light; }
+    .reminder-time-input:focus { border-color: var(--accent); }
+    .reminder-clear-btn { font-size: 11px; color: var(--muted); background: none; border: none; cursor: pointer; font-family: 'DM Mono', monospace; -webkit-tap-highlight-color: transparent; }
+    .reminder-clear-btn:active { color: var(--danger); }
 
     /* ROUTINES */
-    .routine-item { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .routine-item { border-bottom: 1px solid var(--border); }
     .routine-item:last-child { border-bottom: none; }
+    .routine-main { display: flex; align-items: center; gap: 12px; padding: 14px 0; }
     .routine-check { width: 22px; height: 22px; border: 1.5px solid var(--border); border-radius: 50%; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
-    .routine-check.done { background: var(--success); border-color: var(--success); color: white; }
-    .routine-check.done::after { content: '✓'; font-size: 12px; }
+    .routine-check.done { background: var(--success); border-color: var(--success); }
+    .routine-check svg { width: 12px; height: 12px; stroke-width: 2.5; color: white; opacity: 0; }
+    .routine-check.done svg { opacity: 1; }
     .routine-name { flex: 1; font-size: 14px; color: var(--text); }
     .routine-name.done { color: var(--muted); text-decoration: line-through; }
-    .routine-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px; -webkit-tap-highlight-color: transparent; opacity: 0.4; }
-    .routine-delete:active { opacity: 1; color: var(--danger); }
+    .routine-reminder-time { font-size: 11px; color: var(--accent); background: var(--accent-light); border-radius: 6px; padding: 2px 7px; }
+    .routine-icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 4px; -webkit-tap-highlight-color: transparent; display: flex; }
+    .routine-icon-btn:active { color: var(--accent); }
+    .routine-icon-btn.del:active { color: var(--danger); }
+    .routine-icon-btn svg { width: 16px; height: 16px; stroke-width: 1.5; }
+    .routine-reminder-row { padding: 0 0 12px 34px; display: none; align-items: center; gap: 10px; }
+    .routine-reminder-row.open { display: flex; }
     .add-routine-row { display: flex; gap: 10px; margin-top: 20px; }
     .add-routine-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; outline: none; }
     .add-routine-input:focus { border-color: var(--accent); }
     .add-routine-input::placeholder { color: var(--muted); }
-    .add-routine-btn { width: 44px; height: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
+    .add-routine-btn { width: 44px; height: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
     .add-routine-btn:active { background: var(--surface2); }
+    .add-routine-btn svg { width: 18px; height: 18px; stroke-width: 2; }
 
     /* RECORDS */
     .record-item { border-bottom: 1px solid var(--border); }
     .record-item:last-child { border-bottom: none; }
-    .record-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .record-header { display: flex; align-items: center; gap: 8px; padding: 13px 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .record-header:active { opacity: 0.7; }
-    .record-title { font-size: 14px; color: var(--text); margin-bottom: 3px; }
+    .record-info { flex: 1; min-width: 0; }
+    .record-title { font-size: 14px; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .record-date { font-size: 11px; color: var(--muted); }
-    .record-chevron { font-size: 12px; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+    .record-chevron { flex-shrink: 0; transition: transform 0.2s; color: var(--muted); }
+    .record-chevron svg { width: 14px; height: 14px; stroke-width: 1.5; }
     .record-chevron.open { transform: rotate(180deg); }
+    .record-del-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 6px; -webkit-tap-highlight-color: transparent; flex-shrink: 0; display: flex; }
+    .record-del-btn:active { color: var(--danger); }
+    .record-del-btn svg { width: 15px; height: 15px; stroke-width: 1.5; }
     .record-steps { padding-bottom: 12px; display: none; }
     .record-steps.open { display: block; }
     .record-step { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; font-size: 12px; color: var(--muted); }
-    .record-step-icon { flex-shrink: 0; margin-top: 1px; }
+    .record-step svg { width: 12px; height: 12px; stroke-width: 2; flex-shrink: 0; margin-top: 1px; }
 
     /* SETTINGS */
-    .settings-hint { font-size: 11px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; padding: 11px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .settings-hint { font-size: 11px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; padding: 11px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
     .settings-hint a { color: var(--accent); text-decoration: none; }
-    .settings-divider { font-size: 10px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin: 24px 0 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+    .settings-divider { font-size: 10px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin: 20px 0 14px; border-top: 1px solid var(--border); padding-top: 16px; }
+    .notif-status { font-size: 12px; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .notif-status svg { width: 14px; height: 14px; stroke-width: 1.5; }
+    .notif-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); cursor: pointer; -webkit-tap-highlight-color: transparent; margin-bottom: 18px; }
+    .notif-btn:active { background: var(--surface2); }
+    .save-indicator { height: 16px; text-align: center; margin-top: 8px; font-size: 11px; color: var(--success); opacity: 0; transition: opacity 0.3s; }
   </style>
 </head>
 <body>
@@ -196,9 +235,8 @@
 
   <!-- ── OVERLAYS ── -->
 
-  <!-- Add Task -->
   <div class="overlay" id="ov-add">
-    <button class="back-btn" onclick="closeOverlay()">← 返回</button>
+    <button class="back-btn" onclick="closeOverlay()"><i data-lucide="arrow-left"></i> 返回</button>
     <div class="section-title">新增任務</div>
     <div class="field">
       <label>任務是什麼？</label>
@@ -208,31 +246,28 @@
       <label>截止日期（選填）</label>
       <input type="date" id="ddl-input">
     </div>
-    <p class="method-hint">選擇拆步驟的方式：</p>
+    <p class="method-label">選擇拆步驟的方式：</p>
     <div class="btn-row">
       <button class="btn-ghost" onclick="startManual()">自己拆</button>
       <button class="btn-primary" id="ai-btn" onclick="startAI()">AI 幫我拆</button>
     </div>
   </div>
 
-  <!-- Step Editor -->
   <div class="overlay" id="ov-steps">
-    <button class="back-btn" id="steps-back-btn" onclick="stepsBack()">← 返回</button>
+    <button class="back-btn" id="steps-back-btn" onclick="stepsBack()"><i data-lucide="arrow-left"></i> 返回</button>
     <div class="section-title" id="steps-title">步驟</div>
     <div class="steps-scroll">
       <div id="steps-list"></div>
-      <button class="add-step-btn" onclick="addStepRow()">+ 新增步驟</button>
+      <button class="add-step-btn" onclick="addStepRow()"><i data-lucide="plus"></i> 新增步驟</button>
     </div>
     <button class="btn-primary" onclick="saveSteps()">儲存</button>
   </div>
 
-  <!-- Loading -->
   <div class="overlay" id="ov-loading">
     <div class="loading-dots"><span></span><span></span><span></span></div>
     <p class="loading-text">正在拆解任務...</p>
   </div>
 
-  <!-- Complete -->
   <div class="overlay" id="ov-complete">
     <div class="complete-symbol">✓</div>
     <div class="complete-title">做完了</div>
@@ -242,17 +277,15 @@
     <button class="btn-ghost" onclick="closeOverlay(); showPage('main')">繼續</button>
   </div>
 
-  <!-- Switch -->
   <div class="overlay" id="ov-switch">
-    <button class="back-btn" onclick="closeOverlay()">← 返回</button>
+    <button class="back-btn" onclick="closeOverlay()"><i data-lucide="arrow-left"></i> 返回</button>
     <div class="section-title">換一個做</div>
     <div class="switch-options" id="switch-options"></div>
     <button class="snooze-btn" onclick="snoozeCurrentTask()">今天不適合做這個</button>
   </div>
 
-  <!-- All Tasks -->
   <div class="overlay" id="ov-all-tasks">
-    <button class="back-btn" onclick="closeOverlay()">← 返回</button>
+    <button class="back-btn" onclick="closeOverlay()"><i data-lucide="arrow-left"></i> 返回</button>
     <div class="section-title">全部任務</div>
     <div id="all-tasks-list"></div>
   </div>
@@ -263,7 +296,7 @@
     <div class="page active" id="page-main">
       <div class="page-header">
         <span class="page-title">🐺Tasks🐾</span>
-        <button class="icon-btn" onclick="showOverlay('add')" aria-label="新增">+</button>
+        <button class="icon-btn" onclick="showOverlay('add')" aria-label="新增"><i data-lucide="plus"></i></button>
       </div>
       <div id="main-content"></div>
     </div>
@@ -273,7 +306,7 @@
       <div id="routines-list"></div>
       <div class="add-routine-row">
         <input class="add-routine-input" id="routine-input" placeholder="新增每天要做的事..." maxlength="60">
-        <button class="add-routine-btn" onclick="addRoutine()">+</button>
+        <button class="add-routine-btn" onclick="addRoutine()"><i data-lucide="plus"></i></button>
       </div>
     </div>
 
@@ -285,6 +318,12 @@
     <div class="page" id="page-settings">
       <div class="page-header"><span class="page-title">設定</span></div>
       <div class="settings-hint" id="settings-hint"></div>
+
+      <div class="settings-divider">通知</div>
+      <div class="notif-status" id="notif-status"></div>
+      <button class="notif-btn" id="notif-btn" onclick="requestNotifPermission()">請求通知權限</button>
+
+      <div class="settings-divider">AI 設定</div>
       <div class="field">
         <label>AI 類型</label>
         <select id="s-type" onchange="onTypeChange()">
@@ -294,24 +333,25 @@
       </div>
       <div class="field">
         <label>Base URL</label>
-        <input type="text" id="s-baseurl" placeholder="">
+        <input type="text" id="s-baseurl">
       </div>
       <div class="field">
         <label>API Key</label>
-        <input type="password" id="s-apikey" placeholder="">
+        <input type="password" id="s-apikey">
       </div>
       <div class="field">
         <label>Model</label>
-        <input type="text" id="s-model" placeholder="">
+        <input type="text" id="s-model">
       </div>
+
       <div class="settings-divider">自訂 Prompt</div>
       <div class="field">
-        <label>系統 Prompt（留空使用預設）</label>
-        <textarea id="s-prompt" rows="5" placeholder="留空使用預設 prompt"></textarea>
-        <p class="field-hint">注意：自訂 prompt 必須要求 AI 只回傳 JSON 陣列，格式為 [{"text":"步驟內容","minutes":數字}]</p>
+        <label>系統 Prompt</label>
+        <textarea id="s-prompt" rows="6"></textarea>
+        <p class="field-hint">必須要求 AI 只回傳 JSON 陣列，格式：[{"text":"步驟","minutes":數字}]</p>
       </div>
-      <button class="btn-primary" onclick="saveSettings()" style="margin-top:8px">儲存設定</button>
-      <div style="height:16px;text-align:center;margin-top:8px;font-size:11px;color:var(--success);opacity:0;transition:opacity 0.3s" id="save-indicator">已儲存</div>
+      <button class="btn-primary" onclick="saveSettings()">儲存設定</button>
+      <div class="save-indicator" id="save-indicator">已儲存</div>
     </div>
 
   </div>
@@ -319,36 +359,40 @@
   <!-- BOTTOM NAV -->
   <nav id="bottom-nav">
     <button class="nav-btn active" data-page="main" onclick="showPage('main')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
-      <span>主畫面</span>
+      <i data-lucide="home"></i><span>主畫面</span>
     </button>
     <button class="nav-btn" data-page="routines" onclick="showPage('routines')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      <span>例行</span>
+      <i data-lucide="check-square"></i><span>例行</span>
     </button>
     <button class="nav-btn" data-page="records" onclick="showPage('records')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      <span>紀錄</span>
+      <i data-lucide="file-text"></i><span>紀錄</span>
     </button>
     <button class="nav-btn" data-page="settings" onclick="showPage('settings')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      <span>設定</span>
+      <i data-lucide="settings"></i><span>設定</span>
     </button>
   </nav>
 
 </div>
 <script>
+// ── ICONS ─────────────────────────────────────────────
+function applyIcons() {
+  requestAnimationFrame(() => { if (window.lucide) lucide.createIcons(); });
+}
+
 // ── DATA ──────────────────────────────────────────────
-function getTasks()    { return JSON.parse(localStorage.getItem('tasks') || '[]'); }
-function setTasks(v)   { localStorage.setItem('tasks', JSON.stringify(v)); }
-function getRoutines() { return JSON.parse(localStorage.getItem('routines') || '[]'); }
-function setRoutines(v){ localStorage.setItem('routines', JSON.stringify(v)); }
-function getSettings() { return JSON.parse(localStorage.getItem('settings') || '{"type":"anthropic"}'); }
-function setSettings(v){ localStorage.setItem('settings', JSON.stringify(v)); }
-function getCount()    { return parseInt(localStorage.getItem('completedCount') || '0'); }
-function setCount(v)   { localStorage.setItem('completedCount', String(v)); }
-function getCurId()    { return localStorage.getItem('currentTaskId'); }
-function setCurId(v)   { v ? localStorage.setItem('currentTaskId', v) : localStorage.removeItem('currentTaskId'); }
+const ls = localStorage;
+function getTasks()     { return JSON.parse(ls.getItem('tasks') || '[]'); }
+function setTasks(v)    { ls.setItem('tasks', JSON.stringify(v)); }
+function getRoutines()  { return JSON.parse(ls.getItem('routines') || '[]'); }
+function setRoutines(v) { ls.setItem('routines', JSON.stringify(v)); }
+function getSettings()  { return JSON.parse(ls.getItem('settings') || '{"type":"anthropic"}'); }
+function setSettings(v) { ls.setItem('settings', JSON.stringify(v)); }
+function getReminders() { return JSON.parse(ls.getItem('reminders') || '{}'); }
+function setReminders(v){ ls.setItem('reminders', JSON.stringify(v)); }
+function getCount()     { return parseInt(ls.getItem('completedCount') || '0'); }
+function setCount(v)    { ls.setItem('completedCount', String(v)); }
+function getCurId()     { return ls.getItem('currentTaskId'); }
+function setCurId(v)    { v ? ls.setItem('currentTaskId', v) : ls.removeItem('currentTaskId'); }
 
 const DEFAULT_PROMPT = '你是一個任務拆解助手，幫助有ADHD的人把任務拆成可執行的小步驟。每個步驟必須具體、可操作、5到15分鐘內可完成。第一步要特別簡單，降低啟動門檻。只回傳JSON陣列，不要其他文字。格式：[{"text":"步驟內容","minutes":數字}]';
 
@@ -364,6 +408,7 @@ function showPage(name) {
   else if (name === 'routines') renderRoutines();
   else if (name === 'records') renderRecords();
   else if (name === 'settings') renderSettings();
+  applyIcons();
 }
 
 function showOverlay(name) {
@@ -372,11 +417,12 @@ function showOverlay(name) {
   activeOverlay = name;
   if (name === 'switch') renderSwitch();
   else if (name === 'all-tasks') renderAllTasks();
+  applyIcons();
 }
 
 function closeOverlay() {
   if (activeOverlay) { document.getElementById('ov-' + activeOverlay).classList.remove('active'); activeOverlay = null; }
-  renderMain();
+  renderMain(); applyIcons();
 }
 
 // ── HELPERS ───────────────────────────────────────────
@@ -388,35 +434,24 @@ function getCurrentTask() {
 }
 function getPending() { return getTasks().filter(t => !t.completed); }
 function formatDdl(ddl) {
-  if (!ddl) return '';
+  if (!ddl) return null;
   const d = new Date(ddl + 'T00:00:00'); const today = new Date(); today.setHours(0,0,0,0);
   const diff = Math.round((d - today) / 86400000);
-  if (diff < 0) return `逾期 ${-diff} 天`; if (diff === 0) return '今天截止';
-  if (diff === 1) return '明天截止'; return `${diff} 天後截止`;
+  if (diff < 0) return { text: `逾期 ${-diff} 天`, overdue: true };
+  if (diff === 0) return { text: '今天截止', overdue: false };
+  if (diff === 1) return { text: '明天截止', overdue: false };
+  return { text: `${diff} 天後`, overdue: false };
 }
 function formatDate(iso) { const d = new Date(iso); return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`; }
 
-// ── RENDER MAIN ───────────────────────────────────────
+// ── MAIN ──────────────────────────────────────────────
 function renderMain() {
   const task = getCurrentTask(); const pending = getPending();
   const el = document.getElementById('main-content');
   const pendingCount = pending.length;
+  const bar = pendingCount > 0 ? `<div class="all-tasks-bar" onclick="showOverlay('all-tasks')"><span class="all-tasks-bar-left">全部任務</span><div class="all-tasks-bar-right"><span class="all-tasks-bar-count">${pendingCount} 件</span><i data-lucide="chevron-right"></i></div></div>` : '';
 
-  const allTasksBar = pendingCount > 0 ? `
-    <div class="all-tasks-bar" onclick="showOverlay('all-tasks')">
-      <div>
-        <div class="all-tasks-bar-left">全部任務</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="all-tasks-bar-count">${pendingCount} 件</span>
-        <span class="all-tasks-bar-arrow">→</span>
-      </div>
-    </div>` : '';
-
-  if (!task) {
-    el.innerHTML = allTasksBar + `<div class="empty-state"><div class="empty-symbol">○</div><p>什麼都沒有<br>按右上角的 + 新增任務</p></div>`;
-    return;
-  }
+  if (!task) { el.innerHTML = bar + `<div class="empty-state"><div class="empty-symbol">○</div><p>什麼都沒有<br>按右上角的 + 新增任務</p></div>`; applyIcons(); return; }
 
   const step = task.steps.find(s => !s.done);
   if (!step) { completeTask(task); return; }
@@ -425,32 +460,36 @@ function renderMain() {
   const total = task.steps.length;
   const stepIndex = task.steps.indexOf(step);
   const dots = task.steps.map((s,i) => `<div class="progress-dot${s.done?' done':i===stepIndex?' current':''}"></div>`).join('');
+  const ddlInfo = task.ddl ? formatDdl(task.ddl) : null;
+  const ddlBadge = ddlInfo ? `<span class="task-ddl-badge${ddlInfo.overdue?' overdue':''}">${ddlInfo.text}</span>` : '';
 
-  el.innerHTML = allTasksBar + `
+  el.innerHTML = bar + `
     <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
       <div class="task-header-row">
         <div class="task-title-small">${esc(task.title)}</div>
-        <button class="edit-steps-btn" onclick="openEditSteps('${task.id}')">編輯步驟</button>
+        ${ddlBadge}
+        <button class="edit-steps-btn" onclick="openEditSteps('${task.id}')"><i data-lucide="pencil"></i></button>
       </div>
       <div class="progress-dots">${dots}</div>
-      <div class="step-counter">步驟 ${doneCount + 1} / ${total}</div>
+      <div class="step-counter">步驟 ${doneCount+1} / ${total}</div>
       <div class="step-text" id="step-text">${esc(step.text)}</div>
       ${step.minutes ? `<div class="step-time">約 ${step.minutes} 分鐘</div>` : ''}
     </div>
-    <div class="main-actions">
-      <button class="check-btn" id="check-btn" onclick="completeStep()"><span>✓</span><span>做完了這一步</span></button>
+    <div>
+      <button class="check-btn" id="check-btn" onclick="completeStep()"><i data-lucide="check"></i><span>做完了這一步</span></button>
       <button class="switch-btn" onclick="showOverlay('switch')">換一個做</button>
     </div>`;
+  applyIcons();
 }
 
-// ── COMPLETE STEP ─────────────────────────────────────
+// ── STEP ACTIONS ──────────────────────────────────────
 function completeStep() {
   const tasks = getTasks(); const cur = getCurrentTask();
   const task = tasks.find(t => t.id === (cur||{}).id); if (!task) return;
   const step = task.steps.find(s => !s.done); if (!step) return;
   const btn = document.getElementById('check-btn'); const el = document.getElementById('step-text');
   if (btn) btn.disabled = true; if (el) el.classList.add('completing');
-  setTimeout(() => { step.done = true; setTasks(tasks); const next = task.steps.find(s => !s.done); if (!next) completeTask(task); else renderMain(); }, 400);
+  setTimeout(() => { step.done = true; setTasks(tasks); if (!task.steps.find(s => !s.done)) completeTask(task); else renderMain(); }, 400);
 }
 
 function completeTask(task) {
@@ -459,147 +498,103 @@ function completeTask(task) {
   const count = getCount() + 1; setCount(count);
   document.getElementById('complete-task-name').textContent = task.title;
   document.getElementById('total-count').textContent = count;
-  showOverlay('complete');
+  showOverlay('complete'); applyIcons();
 }
 
 // ── STEP EDITOR ───────────────────────────────────────
 let stepCtx = { mode: 'create', taskId: null, title: '', ddl: '' };
 let stepList = [];
 
-function openEditSteps(taskId) {
+function openEditSteps(taskId, fromOverlay) {
   const task = getTasks().find(t => t.id === taskId); if (!task) return;
   stepCtx = { mode: 'edit', taskId };
   stepList = task.steps.map(s => ({...s}));
   document.getElementById('steps-title').textContent = '編輯步驟';
-  document.getElementById('steps-back-btn').setAttribute('data-prev', activeOverlay || '');
-  renderStepEditor();
-  showOverlay('steps');
+  document.getElementById('steps-back-btn').setAttribute('data-prev', fromOverlay || '');
+  renderStepEditor(); showOverlay('steps');
 }
 
+function openEditStepsFromAllTasks(taskId) { openEditSteps(taskId, 'all-tasks'); }
+
 function startManual() {
-  const title = document.getElementById('task-input').value.trim();
-  if (!title) { document.getElementById('task-input').focus(); return; }
+  const title = document.getElementById('task-input').value.trim(); if (!title) { document.getElementById('task-input').focus(); return; }
   const ddl = document.getElementById('ddl-input').value;
   stepCtx = { mode: 'create', taskId: null, title, ddl };
   stepList = [];
   document.getElementById('steps-title').textContent = '步驟';
   document.getElementById('steps-back-btn').setAttribute('data-prev', 'add');
-  renderStepEditor();
-  showOverlay('steps');
+  renderStepEditor(); showOverlay('steps');
 }
 
 function stepsBack() {
-  const prev = document.getElementById('steps-back-btn').getAttribute('data-prev');
+  const prev = document.getElementById('steps-back-btn').getAttribute('data-prev') || '';
   document.getElementById('ov-steps').classList.remove('active');
-  if (prev && prev !== '') {
-    document.getElementById('ov-' + prev).classList.add('active');
-    activeOverlay = prev;
-  } else {
-    activeOverlay = null;
-    renderMain();
-  }
+  if (prev) { document.getElementById('ov-' + prev).classList.add('active'); activeOverlay = prev; if (prev === 'all-tasks') renderAllTasks(); }
+  else { activeOverlay = null; renderMain(); }
+  applyIcons();
 }
 
 function renderStepEditor() {
   const isEdit = stepCtx.mode === 'edit';
   const el = document.getElementById('steps-list');
-  if (stepList.length === 0) {
-    el.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px 0 16px;">還沒有步驟</div>`;
-    return;
-  }
+  if (stepList.length === 0) { el.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px 0 16px;">還沒有步驟</div>`; return; }
   el.innerHTML = stepList.map((s, i) => `
     <div class="step-row">
-      ${isEdit
-        ? `<div class="step-row-done ${s.done?'is-done':''}" onclick="toggleStepDone(${i})"></div>`
-        : `<div class="step-row-num">${i+1}</div>`}
+      ${isEdit ? `<div class="step-row-done ${s.done?'is-done':''}" onclick="toggleStepDone(${i})"><i data-lucide="check"></i></div>` : `<div class="step-row-num">${i+1}</div>`}
       <div class="step-row-inputs">
-        <input type="text" class="step-input-text" data-index="${i}" value="${esc(s.text)}" placeholder="步驟內容...">
-        <input type="number" class="step-input-min" data-index="${i}" value="${s.minutes||''}" placeholder="分鐘" min="1" max="180">
+        <input type="text" class="step-input-text" value="${esc(s.text)}" placeholder="步驟內容...">
+        <input type="number" class="step-input-min" value="${s.minutes||''}" placeholder="分鐘" min="1" max="180">
       </div>
-      <button class="step-row-del" onclick="deleteStepRow(${i})">×</button>
+      <button class="step-row-del" onclick="deleteStepRow(${i})"><i data-lucide="x"></i></button>
     </div>`).join('');
+  applyIcons();
 }
 
-function toggleStepDone(i) {
-  stepList[i].done = !stepList[i].done;
-  renderStepEditor();
-}
+function toggleStepDone(i) { stepList[i].done = !stepList[i].done; renderStepEditor(); }
 
 function addStepRow() {
-  stepList.push({ id: stepList.length, text: '', minutes: null, done: false });
-  renderStepEditor();
-  // focus last text input
-  setTimeout(() => {
-    const inputs = document.querySelectorAll('.step-input-text');
-    if (inputs.length) inputs[inputs.length - 1].focus();
-  }, 50);
+  stepList.push({ id: stepList.length, text: '', minutes: null, done: false }); renderStepEditor();
+  setTimeout(() => { const inputs = document.querySelectorAll('.step-input-text'); if (inputs.length) inputs[inputs.length-1].focus(); }, 60);
 }
 
-function deleteStepRow(i) {
-  stepList.splice(i, 1);
-  renderStepEditor();
-}
+function deleteStepRow(i) { stepList.splice(i,1); renderStepEditor(); }
 
 function collectSteps() {
-  const textInputs = document.querySelectorAll('.step-input-text');
-  const minInputs = document.querySelectorAll('.step-input-min');
-  const result = [];
-  textInputs.forEach((inp, i) => {
-    const text = inp.value.trim();
-    if (!text) return;
-    result.push({
-      id: i,
-      text,
-      minutes: parseInt(minInputs[i].value) || null,
-      done: stepCtx.mode === 'edit' ? (stepList[i]?.done || false) : false
-    });
-  });
-  return result;
+  const texts = document.querySelectorAll('.step-input-text');
+  const mins = document.querySelectorAll('.step-input-min');
+  return Array.from(texts).map((inp,i) => ({ id: i, text: inp.value.trim(), minutes: parseInt(mins[i].value)||null, done: stepCtx.mode==='edit' ? (stepList[i]?.done||false) : false })).filter(s => s.text);
 }
 
 function saveSteps() {
-  const steps = collectSteps();
-  if (steps.length === 0) { alert('請至少新增一個步驟'); return; }
-
+  const steps = collectSteps(); if (steps.length === 0) { alert('請至少新增一個步驟'); return; }
   if (stepCtx.mode === 'create') {
     const tasks = getTasks();
-    const task = { id: Date.now().toString(), title: stepCtx.title, ddl: stepCtx.ddl || null, steps, completed: false, createdAt: new Date().toISOString() };
+    const task = { id: Date.now().toString(), title: stepCtx.title, ddl: stepCtx.ddl||null, steps, completed: false, createdAt: new Date().toISOString() };
     tasks.push(task); setTasks(tasks); setCurId(task.id);
-    document.getElementById('task-input').value = '';
-    document.getElementById('ddl-input').value = '';
+    document.getElementById('task-input').value = ''; document.getElementById('ddl-input').value = '';
     closeOverlay();
   } else {
-    const tasks = getTasks(); const t = tasks.find(t => t.id === stepCtx.taskId);
-    if (t) { t.steps = steps; setTasks(tasks); }
-    const prev = document.getElementById('steps-back-btn').getAttribute('data-prev');
-    document.getElementById('ov-steps').classList.remove('active');
-    activeOverlay = null;
-    if (prev === 'all-tasks') { showOverlay('all-tasks'); }
-    else { renderMain(); }
+    const tasks = getTasks(); const t = tasks.find(t => t.id === stepCtx.taskId); if (t) { t.steps = steps; setTasks(tasks); }
+    stepsBack();
   }
 }
 
 // ── AI FLOW ───────────────────────────────────────────
 async function startAI() {
-  const title = document.getElementById('task-input').value.trim();
-  if (!title) { document.getElementById('task-input').focus(); return; }
+  const title = document.getElementById('task-input').value.trim(); if (!title) { document.getElementById('task-input').focus(); return; }
   const ddl = document.getElementById('ddl-input').value;
-  const s = getSettings();
-  if (!s.apiKey) { alert('請先在設定頁面填入 API Key'); closeOverlay(); showPage('settings'); return; }
-  document.getElementById('ai-btn').disabled = true;
-  showOverlay('loading');
+  const s = getSettings(); if (!s.apiKey) { alert('請先在設定頁面填入 API Key'); closeOverlay(); showPage('settings'); return; }
+  document.getElementById('ai-btn').disabled = true; showOverlay('loading');
   try {
     const system = s.prompt || DEFAULT_PROMPT;
-    const user = `任務：${title}\n${ddl ? '截止日期：'+ddl : '沒有截止日期'}\n請拆解成最多12個步驟，用繁體中文。`;
+    const user = `任務：${title}\n${ddl?'截止日期：'+ddl:'沒有截止日期'}\n請拆解成最多12個步驟，用繁體中文。`;
     const raw = await callAI(system, user);
     const steps = JSON.parse(raw.replace(/```json|```/g,'').trim());
     stepCtx = { mode: 'create', taskId: null, title, ddl };
     stepList = steps.map((s,i) => ({ id: i, text: s.text, minutes: s.minutes, done: false }));
     document.getElementById('steps-title').textContent = '確認步驟';
     document.getElementById('steps-back-btn').setAttribute('data-prev', 'add');
-    renderStepEditor();
-    document.getElementById('ai-btn').disabled = false;
-    showOverlay('steps');
+    renderStepEditor(); document.getElementById('ai-btn').disabled = false; showOverlay('steps');
   } catch (err) {
     console.error(err); document.getElementById('ai-btn').disabled = false;
     alert('發生錯誤：' + err.message); showOverlay('add');
@@ -609,16 +604,16 @@ async function startAI() {
 async function callAI(systemPrompt, userMessage) {
   const s = getSettings(); if (!s.apiKey) throw new Error('no_key');
   const type = s.type || 'anthropic';
-  const TYPE_INFO = { anthropic: { baseUrl: 'https://api.anthropic.com', model: 'claude-sonnet-4-20250514' }, openai: { baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', model: 'gemini-2.5-flash' } };
-  const baseUrl = s.baseUrl || TYPE_INFO[type].baseUrl;
-  const model = s.model || TYPE_INFO[type].model;
+  const DEFAULTS = { anthropic: { url: 'https://api.anthropic.com', model: 'claude-sonnet-4-20250514' }, openai: { url: 'https://generativelanguage.googleapis.com/v1beta/openai', model: 'gemini-2.5-flash' } };
+  const baseUrl = s.baseUrl || DEFAULTS[type].url;
+  const model = s.model || DEFAULTS[type].model;
   if (type === 'anthropic') {
-    const res = await fetch(`${baseUrl}/v1/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': s.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model, max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: userMessage }] }) });
-    const data = await res.json(); if (!res.ok) throw new Error(data.error?.message || 'Anthropic API error');
+    const res = await fetch(`${baseUrl}/v1/messages`, { method:'POST', headers:{'Content-Type':'application/json','x-api-key':s.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}, body:JSON.stringify({model,max_tokens:1000,system:systemPrompt,messages:[{role:'user',content:userMessage}]}) });
+    const data = await res.json(); if (!res.ok) throw new Error(data.error?.message||'Anthropic error');
     return data.content[0].text;
   } else {
-    const res = await fetch(`${baseUrl}/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${s.apiKey}` }, body: JSON.stringify({ model, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }] }) });
-    const data = await res.json(); if (!res.ok) throw new Error(data.error?.message || 'API error');
+    const res = await fetch(`${baseUrl}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${s.apiKey}`}, body:JSON.stringify({model,messages:[{role:'system',content:systemPrompt},{role:'user',content:userMessage}]}) });
+    const data = await res.json(); if (!res.ok) throw new Error(data.error?.message||'API error');
     return data.choices[0].message.content;
   }
 }
@@ -626,119 +621,239 @@ async function callAI(systemPrompt, userMessage) {
 // ── SWITCH ────────────────────────────────────────────
 function renderSwitch() {
   const cur = getCurrentTask();
-  const options = getPending().filter(t => t.id !== (cur||{}).id).sort((a,b) => { if (a.ddl&&b.ddl) return new Date(a.ddl)-new Date(b.ddl); if (a.ddl) return -1; if (b.ddl) return 1; return 0; }).slice(0,3);
+  const options = getPending().filter(t=>t.id!==(cur||{}).id).sort((a,b)=>{if(a.ddl&&b.ddl)return new Date(a.ddl)-new Date(b.ddl);if(a.ddl)return -1;if(b.ddl)return 1;return 0;}).slice(0,3);
   const el = document.getElementById('switch-options');
-  if (options.length === 0) { el.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:32px 0;">沒有其他任務了</div>`; return; }
-  el.innerHTML = options.map(t => { const done = t.steps.filter(s=>s.done).length; const meta = [t.ddl?formatDdl(t.ddl):'',`${done}/${t.steps.length} 步驟`].filter(Boolean).join('・'); return `<div class="task-option" onclick="switchTo('${t.id}')"><div class="task-option-title">${esc(t.title)}</div><div class="task-option-meta">${meta}</div></div>`; }).join('');
-  if (getPending().length > 4) el.innerHTML += `<button class="btn-ghost" onclick="closeOverlay();showOverlay('all-tasks')" style="margin-top:4px">看全部任務</button>`;
+  if (options.length===0) { el.innerHTML=`<div style="color:var(--muted);font-size:13px;text-align:center;padding:32px 0;">沒有其他任務了</div>`; return; }
+  el.innerHTML = options.map(t => { const done=t.steps.filter(s=>s.done).length; const ddlInfo=t.ddl?formatDdl(t.ddl):null; const meta=[ddlInfo?ddlInfo.text:'',`${done}/${t.steps.length} 步驟`].filter(Boolean).join('・'); return `<div class="task-option" onclick="switchTo('${t.id}')"><div class="task-option-title">${esc(t.title)}</div><div class="task-option-meta">${meta}</div></div>`; }).join('');
+  if (getPending().length>4) el.innerHTML+=`<button class="btn-ghost" onclick="closeOverlay();showOverlay('all-tasks')" style="margin-top:4px">看全部任務</button>`;
+  applyIcons();
 }
 function switchTo(id) { setCurId(id); closeOverlay(); }
 function snoozeCurrentTask() { setCurId(null); closeOverlay(); }
 
 // ── ALL TASKS ─────────────────────────────────────────
+let openReminderPickers = new Set();
+
 function renderAllTasks() {
-  const pending = getPending().sort((a,b) => { if (a.ddl&&b.ddl) return new Date(a.ddl)-new Date(b.ddl); if (a.ddl) return -1; if (b.ddl) return 1; return 0; });
+  const pending = getPending().sort((a,b)=>{if(a.ddl&&b.ddl)return new Date(a.ddl)-new Date(b.ddl);if(a.ddl)return -1;if(b.ddl)return 1;return 0;});
+  const reminders = getReminders();
   const el = document.getElementById('all-tasks-list');
-  if (pending.length === 0) { el.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:16px 0;">沒有待辦任務</div>`; return; }
+  if (pending.length===0) { el.innerHTML=`<div style="color:var(--muted);font-size:13px;padding:16px 0;">沒有待辦任務</div>`; return; }
   el.innerHTML = pending.map(t => {
-    const done = t.steps.filter(s=>s.done).length;
-    const meta = [t.ddl?formatDdl(t.ddl):'', `${done}/${t.steps.length} 步驟`].filter(Boolean).join('・');
+    const done=t.steps.filter(s=>s.done).length;
+    const ddlInfo=t.ddl?formatDdl(t.ddl):null;
+    const meta=[ddlInfo?ddlInfo.text:'',`${done}/${t.steps.length} 步驟`].filter(Boolean).join('・');
+    const rid=`task-${t.id}`; const rem=reminders[rid];
+    const pickerOpen=openReminderPickers.has(rid);
+    const bellColor=rem?'style="color:var(--accent)"':'';
     return `<div class="task-list-item">
-      <div class="task-list-row">
+      <div class="task-list-main">
         <div class="task-list-info" onclick="switchTo('${t.id}')">
           <div class="task-list-title">${esc(t.title)}</div>
-          <div class="task-list-meta">${meta}</div>
+          <div class="task-list-meta">${meta}${rem?'・🔔'+rem.time:''}</div>
         </div>
-        <div class="task-list-actions">
-          <button class="task-action-btn" onclick="openEditStepsFromAllTasks('${t.id}')">步驟</button>
-          <button class="task-action-btn del" onclick="deleteTask('${t.id}')">🗑</button>
-        </div>
+        <button class="task-icon-btn" onclick="toggleReminderPicker('${rid}')" ${bellColor}><i data-lucide="bell"></i></button>
+        <button class="task-icon-btn" onclick="renameTask('${t.id}')"><i data-lucide="pencil"></i></button>
+        <button class="task-icon-btn" onclick="openEditStepsFromAllTasks('${t.id}')"><i data-lucide="list"></i></button>
+        <button class="task-icon-btn del" onclick="deleteTask('${t.id}')"><i data-lucide="trash-2"></i></button>
+      </div>
+      <div class="reminder-row ${pickerOpen?'open':''}" id="rp-${rid}">
+        <input type="time" class="reminder-time-input" value="${rem?rem.time:''}" onchange="setReminder('${rid}','${esc(t.title)}',this.value)">
+        <button class="reminder-clear-btn" onclick="clearReminder('${rid}')">清除</button>
       </div>
     </div>`;
   }).join('');
+  applyIcons();
 }
 
-function openEditStepsFromAllTasks(taskId) {
-  document.getElementById('steps-back-btn').setAttribute('data-prev', 'all-tasks');
-  openEditSteps(taskId);
+function toggleReminderPicker(rid) {
+  if (openReminderPickers.has(rid)) openReminderPickers.delete(rid); else { openReminderPickers.clear(); openReminderPickers.add(rid); }
+  renderAllTasks();
+}
+
+function setReminder(rid, title, time) {
+  if (!time) return;
+  const reminders = getReminders(); reminders[rid] = { id: rid, title, time }; setReminders(reminders);
+  renderAllTasks();
+}
+
+function clearReminder(rid) {
+  const reminders = getReminders(); delete reminders[rid]; setReminders(reminders);
+  openReminderPickers.delete(rid); renderAllTasks();
+}
+
+function renameTask(id) {
+  const tasks = getTasks(); const t = tasks.find(t=>t.id===id); if (!t) return;
+  const name = prompt('重新命名任務：', t.title); if (!name || !name.trim()) return;
+  t.title = name.trim(); setTasks(tasks); renderAllTasks();
 }
 
 function deleteTask(id) {
   if (!confirm('確定要刪除這個任務？')) return;
-  let tasks = getTasks(); tasks = tasks.filter(t => t.id !== id); setTasks(tasks);
-  if (getCurId() === id) setCurId(null);
-  renderAllTasks();
+  let tasks = getTasks(); tasks = tasks.filter(t=>t.id!==id); setTasks(tasks);
+  if (getCurId()===id) setCurId(null);
+  openReminderPickers.clear(); renderAllTasks();
 }
 
 // ── ROUTINES ──────────────────────────────────────────
-function isToday(r) { if (!r.lastDone) return false; return new Date(r.lastDone).toDateString() === new Date().toDateString(); }
+let openRoutineReminders = new Set();
+
+function isToday(r) { if (!r.lastDone) return false; return new Date(r.lastDone).toDateString()===new Date().toDateString(); }
+
 function renderRoutines() {
   const routines = getRoutines(); const el = document.getElementById('routines-list');
-  if (routines.length === 0) { el.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:16px 0;line-height:1.6;">在下方新增每天要做的事<br>每天重置，不做完不會有罪惡感</div>`; return; }
-  el.innerHTML = routines.map(r => { const done = isToday(r); return `<div class="routine-item"><div class="routine-check ${done?'done':''}" onclick="toggleRoutine('${r.id}')"></div><div class="routine-name ${done?'done':''}">${esc(r.name)}</div><button class="routine-delete" onclick="deleteRoutine('${r.id}')">×</button></div>`; }).join('');
+  if (routines.length===0) { el.innerHTML=`<div style="color:var(--muted);font-size:13px;padding:16px 0;line-height:1.6;">在下方新增每天要做的事<br>每天重置，不做完不會有罪惡感</div>`; return; }
+  el.innerHTML = routines.map(r => {
+    const done=isToday(r); const pickerOpen=openRoutineReminders.has(r.id);
+    const bellColor=r.reminderTime?'style="color:var(--accent)"':'';
+    return `<div class="routine-item">
+      <div class="routine-main">
+        <div class="routine-check ${done?'done':''}" onclick="toggleRoutine('${r.id}')"><i data-lucide="check"></i></div>
+        <div class="routine-name ${done?'done':''}">${esc(r.name)}</div>
+        ${r.reminderTime?`<span class="routine-reminder-time">${r.reminderTime}</span>`:''}
+        <button class="routine-icon-btn" onclick="toggleRoutineReminder('${r.id}')" ${bellColor}><i data-lucide="bell"></i></button>
+        <button class="routine-icon-btn del" onclick="deleteRoutine('${r.id}')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="routine-reminder-row ${pickerOpen?'open':''}" id="rrp-${r.id}">
+        <input type="time" class="reminder-time-input" value="${r.reminderTime||''}" onchange="setRoutineReminder('${r.id}',this.value)">
+        <button class="reminder-clear-btn" onclick="clearRoutineReminder('${r.id}')">清除</button>
+      </div>
+    </div>`;
+  }).join('');
+  applyIcons();
 }
-function toggleRoutine(id) { const routines = getRoutines(); const r = routines.find(r=>r.id===id); if (!r) return; r.lastDone = isToday(r) ? null : new Date().toISOString(); setRoutines(routines); renderRoutines(); }
-function deleteRoutine(id) { setRoutines(getRoutines().filter(r=>r.id!==id)); renderRoutines(); }
-function addRoutine() { const input = document.getElementById('routine-input'); const name = input.value.trim(); if (!name) return; const routines = getRoutines(); routines.push({id:Date.now().toString(),name,lastDone:null}); setRoutines(routines); input.value=''; renderRoutines(); }
-document.getElementById('routine-input').addEventListener('keydown', e => { if (e.key==='Enter') addRoutine(); });
+
+function toggleRoutineReminder(id) {
+  if (openRoutineReminders.has(id)) openRoutineReminders.delete(id); else { openRoutineReminders.clear(); openRoutineReminders.add(id); }
+  renderRoutines();
+}
+
+function setRoutineReminder(id, time) {
+  const routines = getRoutines(); const r = routines.find(r=>r.id===id); if (!r) return;
+  r.reminderTime = time || null; setRoutines(routines); renderRoutines();
+}
+
+function clearRoutineReminder(id) {
+  const routines = getRoutines(); const r = routines.find(r=>r.id===id); if (!r) return;
+  r.reminderTime = null; setRoutines(routines); openRoutineReminders.delete(id); renderRoutines();
+}
+
+function toggleRoutine(id) {
+  const routines = getRoutines(); const r = routines.find(r=>r.id===id); if (!r) return;
+  r.lastDone = isToday(r)?null:new Date().toISOString(); setRoutines(routines); renderRoutines();
+}
+
+function deleteRoutine(id) {
+  setRoutines(getRoutines().filter(r=>r.id!==id)); openRoutineReminders.delete(id); renderRoutines();
+}
+
+function addRoutine() {
+  const input = document.getElementById('routine-input'); const name = input.value.trim(); if (!name) return;
+  const routines = getRoutines(); routines.push({id:Date.now().toString(),name,lastDone:null,reminderTime:null}); setRoutines(routines); input.value=''; renderRoutines();
+}
+document.getElementById('routine-input').addEventListener('keydown', e=>{ if(e.key==='Enter') addRoutine(); });
 
 // ── RECORDS ───────────────────────────────────────────
 let expandedRecords = new Set();
+
 function renderRecords() {
   const completed = getTasks().filter(t=>t.completed&&t.completedAt).sort((a,b)=>new Date(b.completedAt)-new Date(a.completedAt));
   const el = document.getElementById('records-list');
-  if (completed.length===0) { el.innerHTML=`<div class="empty-state"><div class="empty-symbol">○</div><p>還沒有完成的任務</p></div>`; return; }
+  if (completed.length===0) { el.innerHTML=`<div class="empty-state"><div class="empty-symbol">○</div><p>還沒有完成的任務</p></div>`; applyIcons(); return; }
   el.innerHTML = completed.map(t => {
     const open = expandedRecords.has(t.id);
-    const stepsHtml = t.steps.map(s=>`<div class="record-step"><span class="record-step-icon">${s.done?'✓':'○'}</span><span>${esc(s.text)}</span></div>`).join('');
+    const stepsHtml = t.steps.map(s=>`<div class="record-step"><i data-lucide="${s.done?'check':'circle'}"></i><span>${esc(s.text)}</span></div>`).join('');
     return `<div class="record-item">
       <div class="record-header" onclick="toggleRecord('${t.id}')">
-        <div><div class="record-title">${esc(t.title)}</div><div class="record-date">${formatDate(t.completedAt)}・${t.steps.length} 個步驟</div></div>
-        <span class="record-chevron ${open?'open':''}">▾</span>
+        <div class="record-info"><div class="record-title">${esc(t.title)}</div><div class="record-date">${formatDate(t.completedAt)}・${t.steps.length} 個步驟</div></div>
+        <button class="record-del-btn" onclick="event.stopPropagation();deleteRecord('${t.id}')"><i data-lucide="trash-2"></i></button>
+        <div class="record-chevron ${open?'open':''}"><i data-lucide="chevron-down"></i></div>
       </div>
       <div class="record-steps ${open?'open':''}">${stepsHtml}</div>
     </div>`;
   }).join('');
+  applyIcons();
 }
-function toggleRecord(id) { if (expandedRecords.has(id)) expandedRecords.delete(id); else expandedRecords.add(id); renderRecords(); }
+
+function toggleRecord(id) { if(expandedRecords.has(id)) expandedRecords.delete(id); else expandedRecords.add(id); renderRecords(); }
+
+function deleteRecord(id) {
+  if (!confirm('確定要刪除這筆紀錄？')) return;
+  const tasks = getTasks(); const t = tasks.find(t=>t.id===id); if (!t) return;
+  tasks.splice(tasks.indexOf(t),1); setTasks(tasks); expandedRecords.delete(id); renderRecords();
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────
+function updateNotifStatus() {
+  const el = document.getElementById('notif-status');
+  const btn = document.getElementById('notif-btn');
+  if (!('Notification' in window)) { el.innerHTML='<i data-lucide="bell-off"></i> 這個瀏覽器不支援通知'; btn.style.display='none'; applyIcons(); return; }
+  const p = Notification.permission;
+  if (p==='granted') { el.innerHTML='<i data-lucide="bell"></i> 通知已開啟'; btn.style.display='none'; }
+  else if (p==='denied') { el.innerHTML='<i data-lucide="bell-off"></i> 通知已被封鎖，請在瀏覽器設定中允許'; btn.style.display='none'; }
+  else { el.innerHTML='<i data-lucide="bell-off"></i> 通知未開啟'; btn.style.display='block'; }
+  applyIcons();
+}
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) return;
+  await Notification.requestPermission(); updateNotifStatus();
+}
+
+// Check reminders every 30s
+let lastCheckedMinute = '';
+setInterval(() => {
+  if (Notification.permission !== 'granted') return;
+  const now = new Date();
+  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  if (t === lastCheckedMinute) return;
+  lastCheckedMinute = t;
+  // Task reminders
+  const reminders = getReminders();
+  Object.values(reminders).forEach(r => { if (r.time===t) new Notification('🐺Tasks🐾', {body:`📌 ${r.title}`,icon:'/icon.png'}); });
+  // Routine reminders
+  getRoutines().forEach(r => { if (r.reminderTime===t) new Notification('🐺Tasks🐾', {body:`🔁 ${r.name}`,icon:'/icon.png'}); });
+}, 30000);
 
 // ── SETTINGS ──────────────────────────────────────────
 const TYPE_INFO = {
-  anthropic: { hint: '申請 API Key：<a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>', baseUrl: 'https://api.anthropic.com', model: 'claude-sonnet-4-20250514', keyPlaceholder: 'sk-ant-...' },
-  openai: { hint: 'Gemini：<a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>　Groq：<a href="https://console.groq.com" target="_blank">console.groq.com</a>', baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', model: 'gemini-2.5-flash', keyPlaceholder: 'API Key...' }
+  anthropic: { hint:'申請 API Key：<a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>', url:'https://api.anthropic.com', model:'claude-sonnet-4-20250514', key:'sk-ant-...' },
+  openai: { hint:'Gemini：<a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>　Groq：<a href="https://console.groq.com" target="_blank">console.groq.com</a>', url:'https://generativelanguage.googleapis.com/v1beta/openai', model:'gemini-2.5-flash', key:'API Key...' }
 };
 
 function onTypeChange() {
-  const type = document.getElementById('s-type').value;
-  const info = TYPE_INFO[type];
+  const type = document.getElementById('s-type').value; const info = TYPE_INFO[type];
   document.getElementById('settings-hint').innerHTML = info.hint;
-  document.getElementById('s-baseurl').placeholder = info.baseUrl;
+  document.getElementById('s-baseurl').placeholder = info.url;
   document.getElementById('s-model').placeholder = info.model;
-  document.getElementById('s-apikey').placeholder = info.keyPlaceholder;
+  document.getElementById('s-apikey').placeholder = info.key;
 }
 
 function renderSettings() {
-  const s = getSettings(); const type = s.type || 'anthropic'; const info = TYPE_INFO[type];
+  const s = getSettings(); const type = s.type||'anthropic'; const info = TYPE_INFO[type];
   document.getElementById('s-type').value = type;
-  document.getElementById('s-baseurl').value = s.baseUrl || '';
-  document.getElementById('s-baseurl').placeholder = info.baseUrl;
-  document.getElementById('s-apikey').value = s.apiKey || '';
-  document.getElementById('s-apikey').placeholder = info.keyPlaceholder;
-  document.getElementById('s-model').value = s.model || '';
-  document.getElementById('s-model').placeholder = info.model;
-  document.getElementById('s-prompt').value = s.prompt || '';
+  document.getElementById('s-baseurl').value = s.baseUrl||''; document.getElementById('s-baseurl').placeholder = info.url;
+  document.getElementById('s-apikey').value = s.apiKey||''; document.getElementById('s-apikey').placeholder = info.key;
+  document.getElementById('s-model').value = s.model||''; document.getElementById('s-model').placeholder = info.model;
+  document.getElementById('s-prompt').value = s.prompt || DEFAULT_PROMPT;
   document.getElementById('settings-hint').innerHTML = info.hint;
+  updateNotifStatus();
 }
 
 let saveTimer;
 function saveSettings() {
-  setSettings({ type: document.getElementById('s-type').value, baseUrl: document.getElementById('s-baseurl').value.trim(), apiKey: document.getElementById('s-apikey').value.trim(), model: document.getElementById('s-model').value.trim(), prompt: document.getElementById('s-prompt').value.trim() });
+  setSettings({ type:document.getElementById('s-type').value, baseUrl:document.getElementById('s-baseurl').value.trim(), apiKey:document.getElementById('s-apikey').value.trim(), model:document.getElementById('s-model').value.trim(), prompt:document.getElementById('s-prompt').value.trim() });
   const ind = document.getElementById('save-indicator'); ind.style.opacity='1';
-  clearTimeout(saveTimer); saveTimer = setTimeout(()=>{ ind.style.opacity='0'; }, 2000);
+  clearTimeout(saveTimer); saveTimer = setTimeout(()=>{ind.style.opacity='0';},2000);
+}
+
+// ── SERVICE WORKER ────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
 
 // ── INIT ──────────────────────────────────────────────
-renderMain();
+renderMain(); applyIcons();
 </script>
 </body>
 </html>
