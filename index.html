@@ -48,7 +48,7 @@
 
     /* FORMS - aligned */
     .field { margin-bottom: 16px; }
-    .field label { display: block; font-size: 10px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 7px; }
+    .field label { display: block; font-size: 10px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 7px; padding-left: 4px; }
     .field input, .field textarea, .field select {
       display: block; width: 100%;
       background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
@@ -70,7 +70,7 @@
     .btn-ghost:active { background: var(--surface2); }
     .btn-row { display: flex; gap: 10px; }
     .btn-row .btn-primary, .btn-row .btn-ghost { flex: 1; }
-    .method-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.04em; }
+    .method-label { font-size: 10px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; padding-left: 4px; }
 
     /* MAIN PAGE */
     #main-content { flex: 1; display: flex; flex-direction: column; }
@@ -178,16 +178,22 @@
     /* ROUTINES */
     .routine-item { border-bottom: 1px solid var(--border); }
     .routine-item:last-child { border-bottom: none; }
-    .routine-main { display: flex; align-items: center; gap: 12px; padding: 14px 0; }
+    .routine-main { display: flex; align-items: center; gap: 12px; padding: 14px 0 10px; }
     .routine-check { width: 22px; height: 22px; border: 1.5px solid var(--border); border-radius: 50%; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
     .routine-check.done { background: var(--success); border-color: var(--success); }
     .routine-check svg { width: 12px; height: 12px; stroke-width: 2.5; color: white; opacity: 0; }
     .routine-check.done svg { opacity: 1; }
-    .routine-name { flex: 1; font-size: 14px; color: var(--text); }
+    .routine-body { flex: 1; min-width: 0; }
+    .routine-name { font-size: 14px; color: var(--text); line-height: 1.3; }
     .routine-name.done { color: var(--muted); text-decoration: line-through; }
-    .routine-reminder-time { font-size: 11px; color: var(--accent); background: var(--accent-light); border-radius: 6px; padding: 2px 7px; }
-    .routine-icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 4px; -webkit-tap-highlight-color: transparent; display: flex; }
-    .routine-icon-btn:active { color: var(--accent); }
+    .routine-sub { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+    .routine-bell-btn { display: flex; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent; padding: 0; }
+    .routine-bell-btn svg { width: 13px; height: 13px; stroke-width: 1.5; color: var(--muted); }
+    .routine-bell-btn.has-reminder svg { color: var(--accent); }
+    .routine-time-text { font-size: 11px; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .routine-set-reminder { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .routine-icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 4px; -webkit-tap-highlight-color: transparent; display: flex; flex-shrink: 0; opacity: 0.5; }
+    .routine-icon-btn:active { opacity: 1; }
     .routine-icon-btn.del:active { color: var(--danger); }
     .routine-icon-btn svg { width: 16px; height: 16px; stroke-width: 1.5; }
     .routine-reminder-row { padding: 0 0 12px 34px; display: none; align-items: center; gap: 10px; }
@@ -706,13 +712,18 @@ function renderRoutines() {
   if (routines.length===0) { el.innerHTML=`<div style="color:var(--muted);font-size:13px;padding:16px 0;line-height:1.6;">在下方新增每天要做的事<br>每天重置，不做完不會有罪惡感</div>`; return; }
   el.innerHTML = routines.map(r => {
     const done=isToday(r); const pickerOpen=openRoutineReminders.has(r.id);
-    const bellColor=r.reminderTime?'style="color:var(--accent)"':'';
     return `<div class="routine-item">
       <div class="routine-main">
         <div class="routine-check ${done?'done':''}" onclick="toggleRoutine('${r.id}')"><i data-lucide="check"></i></div>
-        <div class="routine-name ${done?'done':''}">${esc(r.name)}</div>
-        ${r.reminderTime?`<span class="routine-reminder-time">${r.reminderTime}</span>`:''}
-        <button class="routine-icon-btn" onclick="toggleRoutineReminder('${r.id}')" ${bellColor}><i data-lucide="bell"></i></button>
+        <div class="routine-body">
+          <div class="routine-name ${done?'done':''}">${esc(r.name)}</div>
+          <div class="routine-sub">
+            <button class="routine-bell-btn ${r.reminderTime?'has-reminder':''}" onclick="toggleRoutineReminder('${r.id}')">
+              <i data-lucide="bell"></i>
+              ${r.reminderTime ? `<span class="routine-time-text">${r.reminderTime}</span>` : `<span class="routine-set-reminder">設定提醒</span>`}
+            </button>
+          </div>
+        </div>
         <button class="routine-icon-btn del" onclick="deleteRoutine('${r.id}')"><i data-lucide="x"></i></button>
       </div>
       <div class="routine-reminder-row ${pickerOpen?'open':''}" id="rrp-${r.id}">
