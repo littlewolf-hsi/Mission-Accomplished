@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -376,7 +376,7 @@
 <script>
 // ── ICONS ─────────────────────────────────────────────
 function applyIcons() {
-  requestAnimationFrame(() => { if (window.lucide) lucide.createIcons(); });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 0);
 }
 
 // ── DATA ──────────────────────────────────────────────
@@ -422,7 +422,8 @@ function showOverlay(name) {
 
 function closeOverlay() {
   if (activeOverlay) { document.getElementById('ov-' + activeOverlay).classList.remove('active'); activeOverlay = null; }
-  renderMain(); applyIcons();
+  renderMain();
+window.addEventListener("load", () => applyIcons());
 }
 
 // ── HELPERS ───────────────────────────────────────────
@@ -853,7 +854,8 @@ if ('serviceWorker' in navigator) {
 }
 
 // ── INIT ──────────────────────────────────────────────
-renderMain(); applyIcons();
+renderMain();
+window.addEventListener("load", () => applyIcons());
 </script>
 </body>
 </html>
